@@ -83,3 +83,11 @@ export interface ReviewItem {
   visitDate: string;
   tags: string[];
 }
+
+export interface SessionUser {
+  id: number;
+  name: string;
+  email: string;
+  role: "USER" | "ADMIN";
+  token: string;
+}

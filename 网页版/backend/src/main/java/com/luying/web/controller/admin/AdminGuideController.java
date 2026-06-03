@@ -26,7 +26,7 @@ public class AdminGuideController extends BaseController {
 
     @GetMapping
     public ApiResponse<List<Map<String, Object>>> list() {
-        return ok(guideService.list().stream()
+        return ok(guideService.list(null, null).stream()
                 .map(item -> Map.<String, Object>of(
                         "title", item.getTitle(),
                         "status", "PUBLISHED",

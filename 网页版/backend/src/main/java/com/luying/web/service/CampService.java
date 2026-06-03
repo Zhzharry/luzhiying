@@ -7,7 +7,7 @@ import com.luying.web.vo.camp.CampDetailVO;
 import java.util.List;
 
 public interface CampService {
-    PageResult<CampCardVO> list(String keyword, String city);
+    PageResult<CampCardVO> list(String keyword, String city, String location);
 
     CampDetailVO detail(String slug);
 

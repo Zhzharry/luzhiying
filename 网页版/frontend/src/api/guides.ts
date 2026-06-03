@@ -1,6 +1,6 @@
 import { http } from "./http";
 
 export const guidesApi = {
-  list: () => http.get("/guides"),
+  list: (params?: Record<string, unknown>) => http.get("/guides", { params }),
   detail: (slug: string) => http.get(`/guides/${slug}`),
 };

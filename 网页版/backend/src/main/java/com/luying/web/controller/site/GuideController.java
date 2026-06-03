@@ -8,6 +8,7 @@ import com.luying.web.vo.guide.GuideDetailVO;
 import com.luying.web.vo.guide.GuideVO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +25,11 @@ public class GuideController extends BaseController {
     }
 
     @GetMapping
-    public ApiResponse<List<GuideVO>> list() {
-        return ok(guideService.list());
+    public ApiResponse<List<GuideVO>> list(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String cityScope
+    ) {
+        return ok(guideService.list(keyword, cityScope));
     }
 
     @GetMapping("/{slug}")

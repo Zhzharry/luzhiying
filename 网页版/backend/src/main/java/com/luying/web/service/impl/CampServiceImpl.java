@@ -42,7 +42,8 @@ public class CampServiceImpl implements CampService {
     }
 
     @Override
-    public PageResult<CampCardVO> list(String keyword, String city) {
+    public PageResult<CampCardVO> list(String keyword, String city, String location) {
+        String locationTerm = normalizeLocation(location);
         LambdaQueryWrapper<Camp> query = new LambdaQueryWrapper<Camp>()
                 .eq(city != null && !city.isBlank(), Camp::getCity, city)
                 .and(keyword != null && !keyword.isBlank(), wrapper -> wrapper
@@ -53,6 +54,12 @@ public class CampServiceImpl implements CampService {
                         .like(Camp::getDistrict, keyword)
                         .or()
                         .like(Camp::getCampType, keyword))
+                .and(locationTerm != null && !locationTerm.isBlank(), wrapper -> wrapper
+                        .like(Camp::getCity, locationTerm)
+                        .or()
+                        .like(Camp::getDistrict, locationTerm)
+                        .or()
+                        .like(Camp::getAddress, locationTerm))
                 .orderByDesc(Camp::getUpdatedAt)
                 .orderByDesc(Camp::getId);
 
@@ -224,5 +231,18 @@ public class CampServiceImpl implements CampService {
             return "价格待确认";
         }
         return "¥" + camp.getPriceMin() + " - ¥" + camp.getPriceMax();
+    }
+
+    private String normalizeLocation(String location) {
+        if (location == null || location.isBlank()) {
+            return location;
+        }
+        List<String> supportedCities = List.of("杭州", "苏州", "成都");
+        for (String city : supportedCities) {
+            if (location.contains(city)) {
+                return city;
+            }
+        }
+        return location;
     }
 }

@@ -31,9 +31,10 @@ public class CampController extends BaseController {
     @GetMapping
     public ApiResponse<PageResult<CampCardVO>> list(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String city
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String location
     ) {
-        return ok(campService.list(keyword, city));
+        return ok(campService.list(keyword, city, location));
     }
 
     @GetMapping("/{slug}")

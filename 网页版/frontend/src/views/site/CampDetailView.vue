@@ -3,10 +3,12 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { campsApi } from "@/api/camps";
+import { useFavoritesStore } from "@/stores/favorites";
 import CampCard from "@/components/site/CampCard.vue";
 import type { ApiResponse, CampCardItem, CampDetailItem } from "@/types/api";
 
 const route = useRoute();
+const favoritesStore = useFavoritesStore();
 const detail = ref<CampDetailItem | null>(null);
 const reviews = ref<Array<{ author: string; overallScore: number; content: string; visitDate: string; tags: string[] }>>([]);
 const similar = ref<CampCardItem[]>([]);
@@ -22,6 +24,7 @@ onMounted(async () => {
   detail.value = (detailResponse.data as ApiResponse<CampDetailItem>).data;
   reviews.value = (reviewResponse.data as ApiResponse<typeof reviews.value>).data;
   similar.value = (similarResponse.data as ApiResponse<CampCardItem[]>).data;
+  favoritesStore.addRecentCamp(slug);
 });
 </script>
 
@@ -35,7 +38,9 @@ onMounted(async () => {
       </div>
       <div class="quick">
         <div class="price">¥{{ detail.priceMin }} - ¥{{ detail.priceMax }}</div>
-        <button class="btn-primary">加入收藏</button>
+        <button class="btn-primary" @click="favoritesStore.toggleFavorite(detail.slug)">
+          {{ favoritesStore.favoriteCampSlugs.includes(detail.slug) ? "取消收藏" : "加入收藏" }}
+        </button>
       </div>
     </section>
 

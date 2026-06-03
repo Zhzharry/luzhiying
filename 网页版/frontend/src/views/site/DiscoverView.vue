@@ -9,6 +9,7 @@ import type { ApiResponse, CampCardItem, PageResult } from "@/types/api";
 
 const keyword = ref("");
 const city = ref("");
+const location = ref("");
 const cities = ["", "杭州", "苏州", "成都"];
 const items = ref<CampCardItem[]>([]);
 
@@ -16,6 +17,7 @@ async function load() {
   const response = await campsApi.list({
     keyword: keyword.value || undefined,
     city: city.value || undefined,
+    location: location.value || undefined,
   });
   const payload = response.data as ApiResponse<PageResult<CampCardItem>>;
   items.value = payload.data.list;
@@ -35,6 +37,7 @@ onMounted(load);
     <div class="discover-layout">
       <aside class="panel filters">
         <input v-model="keyword" class="field" placeholder="搜索营地、区域、主题" />
+        <input v-model="location" class="field" placeholder="输入你的定位，如 杭州西湖 / 苏州太湖" />
         <select v-model="city" class="field">
           <option v-for="item in cities" :key="item" :value="item">
             {{ item || "全部城市" }}
@@ -47,7 +50,7 @@ onMounted(load);
           <span class="chip">亲子友好</span>
           <span class="chip">宠物友好</span>
         </div>
-        <button class="btn-primary" @click="load">更新结果</button>
+        <button class="btn-primary" @click="load">查找周边营地</button>
         <div class="list">
           <CampCard
             v-for="camp in items"

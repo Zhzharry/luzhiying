@@ -26,7 +26,7 @@ public class AdminCampController extends BaseController {
 
     @GetMapping
     public ApiResponse<List<Map<String, Object>>> list() {
-        return ok(campService.list(null, null).getList().stream()
+        return ok(campService.list(null, null, null).getList().stream()
                 .map(item -> Map.<String, Object>of(
                         "name", item.getName(),
                         "city", item.getCity(),

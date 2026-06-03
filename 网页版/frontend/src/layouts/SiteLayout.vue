@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+function logout() {
+  authStore.logout();
+  router.push("/");
+}
+</script>
+
 <template>
   <div>
     <header class="site-header">
@@ -10,6 +23,16 @@
           <RouterLink to="/favorites">收藏</RouterLink>
           <RouterLink to="/me">我的</RouterLink>
         </nav>
+        <div class="auth">
+          <template v-if="authStore.session">
+            <span class="user">{{ authStore.session.name }}</span>
+            <button class="btn-link" type="button" @click="logout">退出</button>
+          </template>
+          <template v-else>
+            <RouterLink to="/login">登录</RouterLink>
+            <RouterLink to="/register">注册</RouterLink>
+          </template>
+        </div>
       </div>
     </header>
     <main>
@@ -45,4 +68,7 @@
   gap: 18px;
   font-size: 14px;
 }
+.auth { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.user { color: var(--muted); }
+.btn-link { border: 0; background: transparent; color: inherit; cursor: pointer; }
 </style>

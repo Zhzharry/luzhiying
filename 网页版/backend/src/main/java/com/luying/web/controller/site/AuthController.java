@@ -8,6 +8,7 @@ import com.luying.web.dto.auth.RegisterRequest;
 import com.luying.web.service.AuthService;
 import com.luying.web.vo.auth.SessionUserVO;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,7 +41,9 @@ public class AuthController extends BaseController {
     }
 
     @GetMapping("/session")
-    public ApiResponse<SessionUserVO> session() {
-        return ok(authService.mockSession());
+    public ApiResponse<SessionUserVO> session(
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return ok(authService.session(authorization));
     }
 }

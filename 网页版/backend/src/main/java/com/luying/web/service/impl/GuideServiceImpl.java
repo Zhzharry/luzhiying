@@ -24,9 +24,18 @@ public class GuideServiceImpl implements GuideService {
     }
 
     @Override
-    public List<GuideVO> list() {
+    public List<GuideVO> list(String keyword, String cityScope) {
         return guideMapper.selectList(new LambdaQueryWrapper<Guide>()
                         .eq(Guide::getStatus, "PUBLISHED")
+                        .eq(cityScope != null && !cityScope.isBlank(), Guide::getCityScope, cityScope)
+                        .and(keyword != null && !keyword.isBlank(), wrapper -> wrapper
+                                .like(Guide::getTitle, keyword)
+                                .or()
+                                .like(Guide::getSummary, keyword)
+                                .or()
+                                .like(Guide::getCategory, keyword)
+                                .or()
+                                .like(Guide::getContent, keyword))
                         .orderByDesc(Guide::getPublishedAt)
                         .orderByDesc(Guide::getId))
                 .stream()

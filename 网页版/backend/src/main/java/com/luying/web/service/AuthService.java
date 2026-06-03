@@ -9,5 +9,5 @@ public interface AuthService {
 
     SessionUserVO register(RegisterRequest request);
 
-    SessionUserVO mockSession();
+    SessionUserVO session(String token);
 }
