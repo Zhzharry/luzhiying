@@ -2,6 +2,7 @@ services:
   mysql:
     image: mysql:8.4
     container_name: luying-mysql
+    restart: unless-stopped
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
@@ -25,6 +26,7 @@ services:
     build:
       context: ./backend
     container_name: luying-backend
+    restart: unless-stopped
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/luying?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: root
@@ -40,6 +42,7 @@ services:
     build:
       context: ./frontend
     container_name: luying-frontend
+    restart: unless-stopped
     depends_on:
       - backend
     ports:

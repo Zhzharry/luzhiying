@@ -25,21 +25,18 @@
 
 ## 运行前准备
 
-建议先确认本机具备以下环境：
+推荐部署方式是纯 Docker。
+
+也就是只要求环境里有：
 
 - `Docker Desktop`
-- `Java 17+`
-- `Maven 3.9+`
-- `Node.js 20+`
+- `Docker Compose`
 
 快速检查命令：
 
 ```powershell
 docker --version
-java -version
-mvn -version
-node -v
-npm -v
+docker compose version
 ```
 
 ## 方案一：全 Docker 运行
@@ -103,77 +100,6 @@ $env:COMPOSE_PROJECT_NAME="luyingweb"
 docker compose down -v
 ```
 
-## 方案二：本机混合运行
-
-适合你本机能跑 `Java + Node`，但 Docker 镜像源不稳定，或者你只想让数据库走容器。
-
-这套方案会：
-
-- 用 Docker 启动 `MySQL`
-- 用本机 `Maven/Java` 启动后端
-- 用本机 `Node/Vite` 启动前端
-
-### 1. 启动 MySQL
-
-```powershell
-cd D:\programming\Workspace\luying\网页版
-$env:COMPOSE_PROJECT_NAME="luyingweb"
-docker compose up -d mysql
-docker ps
-```
-
-### 2. 确认数据库已健康
-
-```powershell
-docker inspect --format "{{.State.Health.Status}}" luying-mysql
-```
-
-看到 `healthy` 再继续。
-
-### 3. 启动后端
-
-```powershell
-cd D:\programming\Workspace\luying\网页版\backend
-$env:SPRING_DATASOURCE_URL="jdbc:mysql://localhost:13306/luying?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai"
-$env:SPRING_DATASOURCE_USERNAME="root"
-$env:SPRING_DATASOURCE_PASSWORD="root"
-mvn spring-boot:run
-```
-
-后端启动后访问：
-
-```powershell
-http://localhost:8080/api/camps
-```
-
-### 4. 启动前端
-
-新开一个终端：
-
-```powershell
-cd D:\programming\Workspace\luying\网页版\frontend
-npm install
-npm run dev
-```
-
-前端启动后访问：
-
-```powershell
-http://localhost:5173
-```
-
-### 5. 停止本机混合运行
-
-- 终止前端终端
-- 终止后端终端
-- 最后关闭 MySQL 容器
-
-```powershell
-cd D:\programming\Workspace\luying\网页版
-$env:COMPOSE_PROJECT_NAME="luyingweb"
-docker compose stop mysql
-```
-
 ## 一键脚本
 
 如果你不想手敲全部命令，也可以直接用仓库里的脚本。
@@ -190,20 +116,6 @@ cd D:\programming\Workspace\luying\网页版
 ```powershell
 cd D:\programming\Workspace\luying\网页版
 .\scripts\docker-down.ps1
-```
-
-### 本机混合
-
-```powershell
-cd D:\programming\Workspace\luying\网页版
-.\scripts\start-local.ps1
-```
-
-停止：
-
-```powershell
-cd D:\programming\Workspace\luying\网页版
-.\scripts\stop-local.ps1
 ```
 
 ## 假数据说明
@@ -229,7 +141,7 @@ docker exec luying-mysql mysql --default-character-set=utf8mb4 -uroot -proot -D 
 
 ## 推荐验收地址
 
-无论你走哪种方案，都建议优先验收这些页面：
+建议优先验收这些页面：
 
 - 首页
 - 找营地页
@@ -251,10 +163,8 @@ docker exec luying-mysql mysql --default-character-set=utf8mb4 -uroot -proot -D 
 
 ```powershell
 netstat -ano | Select-String ":13306"
-netstat -ano | Select-String ":8080"
 netstat -ano | Select-String ":18080"
 netstat -ano | Select-String ":18081"
-netstat -ano | Select-String ":5173"
 ```
 
 ### 查看容器日志
