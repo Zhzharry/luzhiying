@@ -1,0 +1,163 @@
+CREATE DATABASE IF NOT EXISTS luying DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE luying;
+
+CREATE TABLE IF NOT EXISTS user (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(128) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  avatar VARCHAR(255),
+  role VARCHAR(16) NOT NULL DEFAULT 'USER',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS camp (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  slug VARCHAR(128) NOT NULL UNIQUE,
+  name VARCHAR(128) NOT NULL,
+  province VARCHAR(64),
+  city VARCHAR(64),
+  district VARCHAR(64),
+  address VARCHAR(255),
+  latitude DECIMAL(10,6),
+  longitude DECIMAL(10,6),
+  map_region_key VARCHAR(64),
+  map_x INT,
+  map_y INT,
+  camp_type VARCHAR(64),
+  cover_image VARCHAR(255),
+  gallery_json JSON,
+  price_type VARCHAR(32),
+  price_min INT,
+  price_max INT,
+  booking_required TINYINT(1) DEFAULT 0,
+  opening_status VARCHAR(32),
+  source_type VARCHAR(32),
+  best_season VARCHAR(64),
+  arrival_tips TEXT,
+  risk_tips TEXT,
+  suitable_for_json JSON,
+  rules_json JSON,
+  summary TEXT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS camp_facility (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  camp_id BIGINT NOT NULL,
+  has_toilet TINYINT(1) DEFAULT 0,
+  has_shower TINYINT(1) DEFAULT 0,
+  has_power TINYINT(1) DEFAULT 0,
+  has_water TINYINT(1) DEFAULT 0,
+  allow_fire TINYINT(1) DEFAULT 0,
+  can_overnight TINYINT(1) DEFAULT 0,
+  pet_friendly TINYINT(1) DEFAULT 0,
+  family_friendly TINYINT(1) DEFAULT 0,
+  car_accessible TINYINT(1) DEFAULT 0,
+  signal_strength VARCHAR(64),
+  road_condition VARCHAR(128),
+  parking_distance VARCHAR(64)
+);
+
+CREATE TABLE IF NOT EXISTS camp_tag (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(64) NOT NULL,
+  category VARCHAR(64),
+  slug VARCHAR(64) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS camp_tag_relation (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  camp_id BIGINT NOT NULL,
+  tag_id BIGINT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS review (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  camp_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  overall_score INT,
+  scene_score INT,
+  clean_score INT,
+  quiet_score INT,
+  access_score INT,
+  newbie_score INT,
+  family_score INT,
+  cost_score INT,
+  content TEXT,
+  visit_date DATE,
+  helpful_count INT DEFAULT 0,
+  status VARCHAR(32) DEFAULT 'PENDING',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS review_tag (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(64) NOT NULL,
+  kind VARCHAR(32) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS review_tag_relation (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  review_id BIGINT NOT NULL,
+  tag_id BIGINT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS review_image (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  review_id BIGINT NOT NULL,
+  url VARCHAR(255) NOT NULL,
+  sort_order INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS favorite_list (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS favorite_list_item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  list_id BIGINT NOT NULL,
+  camp_id BIGINT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS recently_viewed (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  camp_id BIGINT NOT NULL,
+  viewed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS guide (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  slug VARCHAR(128) NOT NULL UNIQUE,
+  title VARCHAR(255) NOT NULL,
+  summary TEXT,
+  cover_image VARCHAR(255),
+  category VARCHAR(64),
+  city_scope VARCHAR(64),
+  content LONGTEXT,
+  status VARCHAR(32) DEFAULT 'DRAFT',
+  published_at DATETIME,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS correction_feedback (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  camp_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  field_name VARCHAR(64),
+  current_value VARCHAR(255),
+  suggested_value VARCHAR(255),
+  reason VARCHAR(255),
+  status VARCHAR(32) DEFAULT 'OPEN',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

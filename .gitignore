@@ -1,0 +1,27 @@
+# workspace
+.DS_Store
+Thumbs.db
+
+# frontend
+**/node_modules/
+**/dist/
+**/.vite/
+**/.idea/
+**/.vscode/
+
+# java
+**/target/
+**/.mvn/
+*.log
+
+# env
+.env
+.env.*
+!.env.example
+
+# runtime
+coverage/
+temp/
+tmp/
+**/.runtime/
+*.pid

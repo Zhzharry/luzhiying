@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum OpeningStatus {
+  OPEN
+  LIMITED
+  CLOSED
+}
+
+enum SourceType {
+  OFFICIAL
+  USER_SUBMITTED
+  EDITORIAL
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ReviewTagKind {
+  RECOMMEND
+  WARNING
+}
+
+enum GuideStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum CorrectionStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  passwordHash        String
+  name                String
+  avatar              String?
+  role                UserRole             @default(USER)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  reviews             Review[]
+  favoriteLists       FavoriteList[]
+  recentlyViewed      RecentlyViewed[]
+  correctionFeedbacks CorrectionFeedback[]
+}
+
+model Camp {
+  id             String               @id @default(cuid())
+  slug           String               @unique
+  name           String
+  province       String
+  city           String
+  district       String
+  address        String
+  latitude       Float
+  longitude      Float
+  mapRegionKey   String
+  mapX           Float
+  mapY           Float
+  campType       String
+  coverImage     String
+  gallery        Json
+  priceType      String
+  priceMin       Int?
+  priceMax       Int?
+  bookingRequired Boolean
+  phone          String?
+  wechat         String?
+  openingStatus  OpeningStatus        @default(OPEN)
+  sourceType     SourceType           @default(EDITORIAL)
+  bestSeason     String
+  arrivalTips    String
+  riskTips       String
+  suitableFor    Json
+  rules          Json
+  summary        String
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  facility       CampFacility?
+  tags           CampTagRelation[]
+  reviews        Review[]
+  favoriteItems  FavoriteListItem[]
+  recentlyViewed RecentlyViewed[]
+  correctionFeedbacks CorrectionFeedback[]
+
+  @@index([city])
+}
+
+model CampFacility {
+  id              String  @id @default(cuid())
+  campId          String  @unique
+  hasToilet       Boolean @default(false)
+  hasShower       Boolean @default(false)
+  hasPower        Boolean @default(false)
+  hasWater        Boolean @default(false)
+  allowFire       Boolean @default(false)
+  canOvernight    Boolean @default(false)
+  petFriendly     Boolean @default(false)
+  familyFriendly  Boolean @default(false)
+  carAccessible   Boolean @default(false)
+  signalStrength  String
+  roadCondition   String
+  parkingDistance String
+  camp            Camp    @relation(fields: [campId], references: [id], onDelete: Cascade)
+}
+
+model CampTag {
+  id       String            @id @default(cuid())
+  name     String
+  category String
+  slug     String            @unique
+  camps    CampTagRelation[]
+
+  @@index([slug])
+}
+
+model CampTagRelation {
+  campId String
+  tagId  String
+  camp   Camp    @relation(fields: [campId], references: [id], onDelete: Cascade)
+  tag    CampTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([campId, tagId])
+}
+
+model Review {
+  id           String            @id @default(cuid())
+  campId       String
+  userId       String
+  overallScore Int
+  sceneScore   Int
+  cleanScore   Int
+  quietScore   Int
+  accessScore  Int
+  newbieScore  Int
+  familyScore  Int
+  costScore    Int
+  text         String
+  visitDate    DateTime
+  helpfulCount Int               @default(0)
+  status       ReviewStatus      @default(PENDING)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  camp         Camp              @relation(fields: [campId], references: [id], onDelete: Cascade)
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags         ReviewTagRelation[]
+  images       ReviewImage[]
+
+  @@index([campId, status])
+}
+
+model ReviewTag {
+  id      String              @id @default(cuid())
+  name    String
+  kind    ReviewTagKind
+  reviews ReviewTagRelation[]
+}
+
+model ReviewTagRelation {
+  reviewId String
+  tagId    String
+  review   Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  tag      ReviewTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([reviewId, tagId])
+}
+
+model ReviewImage {
+  id        String @id @default(cuid())
+  reviewId  String
+  url       String
+  sortOrder Int    @default(0)
+  review    Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model FavoriteList {
+  id        String             @id @default(cuid())
+  userId    String
+  name      String
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     FavoriteListItem[]
+
+  @@index([userId])
+}
+
+model FavoriteListItem {
+  id        String       @id @default(cuid())
+  listId    String
+  campId    String
+  createdAt DateTime     @default(now())
+  list      FavoriteList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  camp      Camp         @relation(fields: [campId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, campId])
+}
+
+model RecentlyViewed {
+  id       String   @id @default(cuid())
+  userId   String
+  campId   String
+  viewedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  camp     Camp     @relation(fields: [campId], references: [id], onDelete: Cascade)
+
+  @@index([userId, viewedAt])
+}
+
+model Guide {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  title       String
+  summary     String
+  coverImage  String
+  category    String
+  cityScope   String
+  content     String
+  status      GuideStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([slug])
+}
+
+model CorrectionFeedback {
+  id             String           @id @default(cuid())
+  campId          String
+  userId          String
+  fieldName       String
+  currentValue    String
+  suggestedValue  String
+  reason          String
+  status          CorrectionStatus @default(OPEN)
+  createdAt       DateTime        @default(now())
+  camp            Camp            @relation(fields: [campId], references: [id], onDelete: Cascade)
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
