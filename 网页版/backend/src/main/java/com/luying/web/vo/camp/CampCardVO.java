@@ -12,4 +12,5 @@ public class CampCardVO {
     private String summary;
     private String priceText;
     private Double score;
+    private Double distanceKm;
 }

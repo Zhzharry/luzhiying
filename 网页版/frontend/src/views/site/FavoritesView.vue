@@ -2,19 +2,20 @@
 import { onMounted, ref } from "vue";
 import CampCard from "@/components/site/CampCard.vue";
 import { useFavoritesStore } from "@/stores/favorites";
-import { campsApi } from "@/api/camps";
-import type { ApiResponse, CampCardItem } from "@/types/api";
+import type { CampCardItem } from "@/types/api";
 
 const favoritesStore = useFavoritesStore();
 const items = ref<CampCardItem[]>([]);
+const loading = ref(false);
 
 async function load() {
-  if (!favoritesStore.favoriteCampSlugs.length) {
-    items.value = [];
-    return;
+  loading.value = true;
+  try {
+    await favoritesStore.syncFromServer();
+    items.value = favoritesStore.favoriteLists[0]?.camps || [];
+  } finally {
+    loading.value = false;
   }
-  const response = await campsApi.compare(favoritesStore.favoriteCampSlugs);
-  items.value = (response.data as ApiResponse<CampCardItem[]>).data;
 }
 
 onMounted(load);
@@ -28,7 +29,8 @@ onMounted(load);
       <div class="actions">
         <RouterLink class="btn-primary" to="/compare">进入对比</RouterLink>
       </div>
-      <div v-if="items.length" class="list">
+      <div v-if="loading" class="empty">正在同步收藏夹...</div>
+      <div v-else-if="items.length" class="list">
         <CampCard
           v-for="camp in items"
           :key="camp.slug"

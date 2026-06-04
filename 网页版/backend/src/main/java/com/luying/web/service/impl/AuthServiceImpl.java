@@ -5,17 +5,23 @@ import com.luying.web.dto.auth.LoginRequest;
 import com.luying.web.dto.auth.RegisterRequest;
 import com.luying.web.entity.User;
 import com.luying.web.mapper.UserMapper;
+import com.luying.web.security.JwtTokenService;
 import com.luying.web.service.AuthService;
 import com.luying.web.vo.auth.SessionUserVO;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
 
-    public AuthServiceImpl(UserMapper userMapper) {
+    public AuthServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService) {
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenService = jwtTokenService;
     }
 
     @Override
@@ -44,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPasswordHash(request.getPassword());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
         userMapper.insert(user);
         return toSession(user);
@@ -57,26 +63,32 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
         User user = userMapper.selectById(userId);
-        return user == null ? null : toSession(user);
+        return user == null ? null : toSession(user, extractBearer(token));
     }
 
     private boolean matches(String stored, String incoming) {
         if (stored == null) {
             return false;
         }
-        if (stored.equals(incoming)) {
-            return true;
+        if (stored.startsWith("$2a$") || stored.startsWith("$2b$") || stored.startsWith("$2y$")) {
+            return passwordEncoder.matches(incoming, stored);
         }
         return "mock-hash".equals(stored) && "123456".equals(incoming);
     }
 
     private SessionUserVO toSession(User user) {
+        String token = jwtTokenService.generateToken(user.getId(), user.getRole());
+        return toSession(user, token);
+    }
+
+    private SessionUserVO toSession(User user, String token) {
         return SessionUserVO.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .token("mock-token-" + user.getId())
+                .token(token)
+                .expiresAt(jwtTokenService.parseExpiration(token).toString())
                 .build();
     }
 
@@ -84,14 +96,14 @@ public class AuthServiceImpl implements AuthService {
         if (authorization == null || authorization.isBlank()) {
             return null;
         }
-        String token = authorization.startsWith("Bearer ") ? authorization.substring(7) : authorization;
-        if (!token.startsWith("mock-token-")) {
+        String token = extractBearer(authorization);
+        if (!jwtTokenService.isValid(token)) {
             return null;
         }
-        try {
-            return Long.parseLong(token.substring("mock-token-".length()));
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
+        return jwtTokenService.parseUserId(token);
+    }
+
+    private String extractBearer(String authorization) {
+        return authorization.startsWith("Bearer ") ? authorization.substring(7) : authorization;
     }
 }

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { authApi } from "@/api/auth";
+import { useFavoritesStore } from "@/stores/favorites";
 import type { ApiResponse, SessionUser } from "@/types/api";
 
 const STORAGE_KEY = "luying-auth-session";
@@ -49,12 +50,14 @@ export const useAuthStore = defineStore("auth", {
       const response = await authApi.login(payload);
       const session = (response.data as ApiResponse<SessionUser>).data;
       this.setSession(session, session.token);
+      await useFavoritesStore().syncFromServer();
       return session;
     },
     async register(payload: { name: string; email: string; password: string }) {
       const response = await authApi.register(payload);
       const session = (response.data as ApiResponse<SessionUser>).data;
       this.setSession(session, session.token);
+      await useFavoritesStore().syncFromServer();
       return session;
     },
     async fetchSession() {
@@ -79,6 +82,7 @@ export const useAuthStore = defineStore("auth", {
       this.session = null;
       this.token = "";
       this.persist();
+      useFavoritesStore().clearServerState();
     },
   },
 });

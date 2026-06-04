@@ -11,7 +11,7 @@
 - `网页版/backend/`
   - `Spring Boot + MyBatis-Plus + MySQL` 共享后端
 - `小程序版/frontend/`
-  - 小程序前端骨架，未来复用同一个 Java 后端
+  - `uni-app + Vue 3` 小程序前端，复用同一个 Java 后端
 - `legacy/next-prototype/`
   - 旧版 `Next.js + Prisma` 探索代码，仅保留参考，不再作为主线
 
@@ -22,6 +22,7 @@
 - 网页端数据库：MySQL 8
 - 小程序后端：与网页端共用 Java 后端
 - 管理后台：与网页端用户端同一前端项目
+- 小程序前端：uni-app + Vue 3
 
 ## 运行前准备
 

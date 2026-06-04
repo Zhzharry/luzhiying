@@ -15,4 +15,5 @@ public class SessionUserVO {
     private String email;
     private String role;
     private String token;
+    private String expiresAt;
 }

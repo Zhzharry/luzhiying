@@ -22,13 +22,16 @@ public interface ReviewMapper extends BaseMapper<Review> {
     @Select("""
             SELECT
               r.id,
+              u.id AS author_id,
               c.slug AS camp_slug,
               c.name AS camp_name,
               u.name AS author,
               r.overall_score,
               r.content,
               r.status,
-              r.visit_date
+              r.visit_date,
+              r.helpful_count,
+              r.created_at
             FROM review r
             JOIN camp c ON c.id = r.camp_id
             JOIN user u ON u.id = r.user_id
@@ -40,17 +43,62 @@ public interface ReviewMapper extends BaseMapper<Review> {
     @Select("""
             SELECT
               r.id,
+              u.id AS author_id,
               c.slug AS camp_slug,
               c.name AS camp_name,
               u.name AS author,
               r.overall_score,
               r.content,
               r.status,
-              r.visit_date
+              r.visit_date,
+              r.helpful_count,
+              r.created_at
+            FROM review r
+            JOIN camp c ON c.id = r.camp_id
+            JOIN user u ON u.id = r.user_id
+            WHERE r.user_id = #{userId}
+            ORDER BY r.created_at DESC, r.id DESC
+            """)
+    List<ReviewRecord> selectByUserId(@Param("userId") Long userId);
+
+    @Select("""
+            SELECT
+              r.id,
+              u.id AS author_id,
+              c.slug AS camp_slug,
+              c.name AS camp_name,
+              u.name AS author,
+              r.overall_score,
+              r.content,
+              r.status,
+              r.visit_date,
+              r.helpful_count,
+              r.created_at
             FROM review r
             JOIN camp c ON c.id = r.camp_id
             JOIN user u ON u.id = r.user_id
             ORDER BY r.created_at DESC, r.id DESC
             """)
     List<ReviewRecord> selectAllWithRelations();
+
+    @Select("""
+            SELECT
+              r.id,
+              u.id AS author_id,
+              c.slug AS camp_slug,
+              c.name AS camp_name,
+              u.name AS author,
+              r.overall_score,
+              r.content,
+              r.status,
+              r.visit_date,
+              r.helpful_count,
+              r.created_at
+            FROM review r
+            JOIN camp c ON c.id = r.camp_id
+            JOIN user u ON u.id = r.user_id
+            WHERE r.id = #{id}
+            LIMIT 1
+            """)
+    ReviewRecord selectByIdWithRelations(@Param("id") Long id);
 }

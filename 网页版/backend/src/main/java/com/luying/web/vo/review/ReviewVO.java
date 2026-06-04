@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class ReviewVO {
     private Long id;
+    private Long authorId;
     private String campSlug;
     private String campName;
     private String author;
@@ -12,5 +13,8 @@ public class ReviewVO {
     private String content;
     private String status;
     private String visitDate;
+    private Integer helpfulCount;
+    private String createdAt;
+    private Integer floor;
     private java.util.List<String> tags;
 }

@@ -5,5 +5,6 @@ export const campsApi = {
   detail: (slug: string) => http.get(`/camps/${slug}`),
   reviews: (slug: string) => http.get(`/camps/${slug}/reviews`),
   similar: (slug: string) => http.get(`/camps/${slug}/similar`),
+  view: (slug: string) => http.post(`/camps/${slug}/view`),
   compare: (slugs: string[]) => http.post("/compare", { slugs }),
 };

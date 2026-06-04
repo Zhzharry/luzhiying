@@ -19,4 +19,15 @@ app.use(ElementPlus);
 useAuthStore(pinia).hydrate();
 useFavoritesStore(pinia).hydrate();
 
+const authStore = useAuthStore(pinia);
+const favoritesStore = useFavoritesStore(pinia);
+
+if (authStore.token) {
+  authStore.fetchSession().then((session) => {
+    if (session) {
+      favoritesStore.syncFromServer().catch(() => undefined);
+    }
+  });
+}
+
 app.mount("#app");

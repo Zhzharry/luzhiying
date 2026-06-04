@@ -29,12 +29,20 @@ onMounted(async () => {
       <div class="meta">{{ detail.category }} · {{ detail.cityScope }}</div>
       <h1>{{ detail.title }}</h1>
       <p>{{ detail.summary }}</p>
-      <h2>正文</h2>
+      <div class="author-row">
+        <span class="author-link">{{ detail.authorName }}</span>
+        <span class="chip">{{ detail.authorRole }}</span>
+        <span class="meta">{{ detail.publishedAt }}</span>
+      </div>
+      <div class="tag-row">
+        <span v-for="tag in detail.moodTags" :key="tag" class="chip">{{ tag }}</span>
+      </div>
+      <h2>攻略正文</h2>
       <p>{{ detail.content }}</p>
     </article>
 
     <section v-if="related.length" class="related">
-      <h2>相关营地</h2>
+      <h2>这篇攻略里提到的营地</h2>
       <div class="camp-grid">
         <CampCard
           v-for="camp in related"
@@ -58,5 +66,17 @@ onMounted(async () => {
 h2 { margin-top: 18px; }
 p { color: var(--muted); line-height: 1.8; }
 .related { margin-top: 18px; }
+.author-row,
+.tag-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.author-link {
+  color: var(--primary-deep);
+  font-weight: 700;
+}
 .camp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
 </style>

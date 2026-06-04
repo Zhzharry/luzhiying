@@ -13,3 +13,8 @@ mybatis-plus:
 
 knife4j:
   enable: true
+
+security:
+  jwt:
+    secret: ${SECURITY_JWT_SECRET:QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo0NTY3ODkwQUJDREVGR0g=}
+    expiration-hours: ${SECURITY_JWT_EXPIRATION_HOURS:168}

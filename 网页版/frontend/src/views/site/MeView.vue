@@ -3,28 +3,29 @@ import { computed, onMounted, ref } from "vue";
 import CampCard from "@/components/site/CampCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useFavoritesStore } from "@/stores/favorites";
-import { campsApi } from "@/api/camps";
-import type { ApiResponse, CampCardItem } from "@/types/api";
+import { meApi } from "@/api/me";
+import type { ApiResponse, MeOverview } from "@/types/api";
 
 const authStore = useAuthStore();
 const favoritesStore = useFavoritesStore();
-const favoriteItems = ref<CampCardItem[]>([]);
-const recentItems = ref<CampCardItem[]>([]);
+const overview = ref<MeOverview | null>(null);
+const loading = ref(false);
 
 const summary = computed(() => [
-  { label: "收藏营地", value: favoritesStore.favoriteCampSlugs.length },
-  { label: "最近浏览", value: favoritesStore.recentCampSlugs.length },
-  { label: "攻略搜索记录", value: favoritesStore.guideSearchHistory.length },
+  { label: "收藏营地", value: overview.value?.favoriteCount || 0 },
+  { label: "最近浏览", value: overview.value?.recentCount || 0 },
+  { label: "我的评论", value: overview.value?.reviewCount || 0 },
 ]);
 
 async function load() {
-  if (favoritesStore.favoriteCampSlugs.length) {
-    const favoriteResponse = await campsApi.compare(favoritesStore.favoriteCampSlugs);
-    favoriteItems.value = (favoriteResponse.data as ApiResponse<CampCardItem[]>).data;
-  }
-  if (favoritesStore.recentCampSlugs.length) {
-    const recentResponse = await campsApi.compare(favoritesStore.recentCampSlugs);
-    recentItems.value = (recentResponse.data as ApiResponse<CampCardItem[]>).data;
+  loading.value = true;
+  try {
+    const response = await meApi.overview();
+    overview.value = (response.data as ApiResponse<MeOverview>).data;
+    favoritesStore.recentCampSlugs = overview.value.recentCamps.map((item) => item.slug);
+    favoritesStore.persist();
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -38,10 +39,10 @@ onMounted(load);
       <p>这里集中查看你的账号信息、收藏营地、最近浏览和攻略搜索记录。</p>
       <div class="profile">
         <div>
-          <strong>{{ authStore.session?.name }}</strong>
-          <div class="muted">{{ authStore.session?.email }}</div>
+          <strong>{{ overview?.user.name || authStore.session?.name }}</strong>
+          <div class="muted">{{ overview?.user.email || authStore.session?.email }}</div>
         </div>
-        <div class="chip">{{ authStore.session?.role }}</div>
+        <div class="chip">{{ overview?.user.role || authStore.session?.role }}</div>
       </div>
       <div class="stats">
         <div v-for="item in summary" :key="item.label" class="stat">
@@ -58,9 +59,10 @@ onMounted(load);
       </section>
       <section class="section">
         <h2>我的收藏</h2>
-        <div v-if="favoriteItems.length" class="list">
+        <div v-if="loading" class="muted">正在加载你的内容...</div>
+        <div v-else-if="overview?.favoriteCamps.length" class="list">
           <CampCard
-            v-for="camp in favoriteItems"
+            v-for="camp in overview.favoriteCamps"
             :key="camp.slug"
             :slug="camp.slug"
             :title="camp.name"
@@ -74,9 +76,9 @@ onMounted(load);
       </section>
       <section class="section">
         <h2>最近浏览</h2>
-        <div v-if="recentItems.length" class="list">
+        <div v-if="overview?.recentCamps.length" class="list">
           <CampCard
-            v-for="camp in recentItems"
+            v-for="camp in overview.recentCamps"
             :key="camp.slug"
             :slug="camp.slug"
             :title="camp.name"
@@ -87,6 +89,20 @@ onMounted(load);
           />
         </div>
         <div v-else class="muted">还没有浏览记录。</div>
+      </section>
+      <section class="section">
+        <h2>我的评论</h2>
+        <div v-if="overview?.myReviews.length" class="review-list">
+          <article v-for="review in overview.myReviews" :key="review.id" class="review-item">
+            <div class="row">
+              <strong>{{ review.campName }}</strong>
+              <span class="chip">{{ review.status }}</span>
+            </div>
+            <div class="muted">{{ review.visitDate }}</div>
+            <p>{{ review.content }}</p>
+          </article>
+        </div>
+        <div v-else class="muted">你还没有发布过评论。</div>
       </section>
     </div>
   </div>
@@ -102,4 +118,7 @@ p, .muted { color: var(--muted); line-height: 1.8; }
 .section { margin-top: 24px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.review-list { display: grid; gap: 12px; margin-top: 12px; }
+.review-item { border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+.row { display: flex; justify-content: space-between; gap: 12px; }
 </style>

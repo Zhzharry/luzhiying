@@ -10,4 +10,9 @@ public class GuideVO {
     private String summary;
     private String category;
     private String cityScope;
+    private Long authorId;
+    private String authorName;
+    private String authorRole;
+    private String publishedAt;
+    private java.util.List<String> moodTags;
 }

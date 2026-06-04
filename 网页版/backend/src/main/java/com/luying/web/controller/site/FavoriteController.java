@@ -3,12 +3,11 @@ package com.luying.web.controller.site;
 import com.luying.web.common.api.BaseController;
 import com.luying.web.common.constants.ApiConstants;
 import com.luying.web.common.result.ApiResponse;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.luying.web.dto.favorite.FavoriteItemRequest;
+import com.luying.web.service.FavoriteService;
+import com.luying.web.vo.favorite.FavoriteListVO;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -17,23 +16,42 @@ import java.util.Map;
 @RequestMapping(ApiConstants.API_PREFIX + "/favorite-lists")
 public class FavoriteController extends BaseController {
 
+    private final FavoriteService favoriteService;
+
+    public FavoriteController(FavoriteService favoriteService) {
+        this.favoriteService = favoriteService;
+    }
+
     @GetMapping
-    public ApiResponse<List<Map<String, Object>>> list() {
-        return ok(List.of(Map.of("id", 1, "name", "默认收藏夹")));
+    public ApiResponse<List<FavoriteListVO>> list(
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return ok(favoriteService.list(authorization));
     }
 
     @PostMapping
-    public ApiResponse<Map<String, Object>> create() {
-        return ok(Map.of("message", "创建收藏夹接口占位"));
+    public ApiResponse<FavoriteListVO> create(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestBody(required = false) Map<String, String> payload
+    ) {
+        return ok(favoriteService.createDefaultIfMissing(authorization, payload == null ? null : payload.get("name")));
     }
 
     @PostMapping("/{id}/items")
-    public ApiResponse<Map<String, Object>> addItem(@PathVariable Long id) {
-        return ok(Map.of("listId", id, "message", "添加收藏项接口占位"));
+    public ApiResponse<FavoriteListVO> addItem(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @PathVariable Long id,
+            @Valid @RequestBody FavoriteItemRequest request
+    ) {
+        return ok(favoriteService.addItem(authorization, id, request.getCampSlug()));
     }
 
     @DeleteMapping("/{id}/items/{campId}")
-    public ApiResponse<Map<String, Object>> removeItem(@PathVariable Long id, @PathVariable Long campId) {
-        return ok(Map.of("listId", id, "campId", campId, "message", "删除收藏项接口占位"));
+    public ApiResponse<Boolean> removeItem(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @PathVariable Long id,
+            @PathVariable Long campId
+    ) {
+        return ok(favoriteService.removeItem(authorization, id, campId));
     }
 }

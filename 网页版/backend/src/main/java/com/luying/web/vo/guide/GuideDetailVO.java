@@ -14,6 +14,11 @@ public class GuideDetailVO {
     private String summary;
     private String category;
     private String cityScope;
+    private Long authorId;
+    private String authorName;
+    private String authorRole;
+    private String publishedAt;
+    private List<String> moodTags;
     private String content;
     private List<String> relatedCampSlugs;
 }

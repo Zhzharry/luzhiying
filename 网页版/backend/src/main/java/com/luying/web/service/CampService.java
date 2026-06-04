@@ -7,7 +7,15 @@ import com.luying.web.vo.camp.CampDetailVO;
 import java.util.List;
 
 public interface CampService {
-    PageResult<CampCardVO> list(String keyword, String city, String location);
+    PageResult<CampCardVO> list(
+            String keyword,
+            String city,
+            String locationText,
+            Double latitude,
+            Double longitude,
+            Integer radiusKm,
+            String sortBy
+    );
 
     CampDetailVO detail(String slug);
 
@@ -16,4 +24,6 @@ public interface CampService {
     List<CampCardVO> similar(String slug);
 
     List<CampCardVO> compare(List<String> slugs);
+
+    void recordView(String authorization, String slug);
 }

@@ -1,0 +1,75 @@
+{
+  "pages": [
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "露之营"
+      }
+    },
+    {
+      "path": "pages/discover/index",
+      "style": {
+        "navigationBarTitleText": "找营地"
+      }
+    },
+    {
+      "path": "pages/camp-detail/index",
+      "style": {
+        "navigationBarTitleText": "营地详情"
+      }
+    },
+    {
+      "path": "pages/guides/index",
+      "style": {
+        "navigationBarTitleText": "攻略"
+      }
+    },
+    {
+      "path": "pages/guide-detail/index",
+      "style": {
+        "navigationBarTitleText": "攻略详情"
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/me/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "露之营",
+    "navigationBarBackgroundColor": "#f4f1e8",
+    "backgroundColor": "#f4f1e8"
+  },
+  "tabBar": {
+    "color": "#68766d",
+    "selectedColor": "#2f5d50",
+    "backgroundColor": "#fffdf9",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/discover/index",
+        "text": "找营地"
+      },
+      {
+        "pagePath": "pages/guides/index",
+        "text": "攻略"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "我的"
+      }
+    ]
+  }
+}

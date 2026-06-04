@@ -1,0 +1,13 @@
+{
+  "name": "露之营",
+  "appid": "__UNI__LUZHIYING",
+  "description": "露之营小程序端",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "mp-weixin": {
+    "appid": "touristappid",
+    "setting": {
+      "urlCheck": false
+    }
+  }
+}

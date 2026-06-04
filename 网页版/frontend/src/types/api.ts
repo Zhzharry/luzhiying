@@ -22,6 +22,7 @@ export interface CampCardItem {
   summary: string;
   priceText: string;
   score: number;
+  distanceKm?: number | null;
 }
 
 export interface CampDetailItem extends CampCardItem {
@@ -64,7 +65,14 @@ export interface GuideItem {
   title: string;
   summary: string;
   category: string;
+  sectionKey?: string;
+  sectionLabel?: string;
   cityScope: string;
+  authorId: number;
+  authorName: string;
+  authorRole: string;
+  publishedAt: string;
+  moodTags: string[];
 }
 
 export interface GuideDetailItem extends GuideItem {
@@ -74,6 +82,7 @@ export interface GuideDetailItem extends GuideItem {
 
 export interface ReviewItem {
   id: number;
+  authorId?: number;
   campSlug: string;
   campName: string;
   author: string;
@@ -81,6 +90,9 @@ export interface ReviewItem {
   content: string;
   status: string;
   visitDate: string;
+  helpfulCount: number;
+  createdAt: string;
+  floor?: number;
   tags: string[];
 }
 
@@ -90,4 +102,22 @@ export interface SessionUser {
   email: string;
   role: "USER" | "ADMIN";
   token: string;
+  expiresAt?: string;
+}
+
+export interface FavoriteListItem {
+  id: number;
+  name: string;
+  itemCount: number;
+  camps: CampCardItem[];
+}
+
+export interface MeOverview {
+  user: SessionUser;
+  favoriteCount: number;
+  recentCount: number;
+  reviewCount: number;
+  favoriteCamps: CampCardItem[];
+  recentCamps: CampCardItem[];
+  myReviews: ReviewItem[];
 }

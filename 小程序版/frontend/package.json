@@ -1,8 +1,21 @@
 {
   "name": "luying-mini-frontend",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "echo \"Mini program scaffold only\""
+    "dev:h5": "vite",
+    "build:h5": "vite build",
+    "dev:mp-weixin": "cross-env UNI_PLATFORM=mp-weixin vite",
+    "build:mp-weixin": "cross-env UNI_PLATFORM=mp-weixin vite build"
+  },
+  "dependencies": {
+    "vue": "^3.5.34"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "latest",
+    "@dcloudio/vite-plugin-uni": "latest",
+    "cross-env": "^7.0.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.1"
   }
 }

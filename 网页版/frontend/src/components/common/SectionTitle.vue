@@ -15,15 +15,32 @@ defineProps<{
 </template>
 
 <style scoped lang="scss">
+.section-title {
+  margin-bottom: 18px;
+}
+
 .eyebrow {
-  color: var(--muted);
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary-deep);
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: rgba(47, 93, 80, 0.36);
 }
 
 h2 {
-  margin: 6px 0 0;
-  font-size: 34px;
+  margin: 10px 0 0;
+  font-size: 38px;
+  line-height: 1.16;
 }
 
 p {

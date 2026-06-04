@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,9 +33,22 @@ public class CampController extends BaseController {
     public ApiResponse<PageResult<CampCardVO>> list(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) String location
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String locationText,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Integer radiusKm,
+            @RequestParam(required = false) String sortBy
     ) {
-        return ok(campService.list(keyword, city, location));
+        return ok(campService.list(
+                keyword,
+                city,
+                locationText != null ? locationText : location,
+                latitude,
+                longitude,
+                radiusKm,
+                sortBy
+        ));
     }
 
     @GetMapping("/{slug}")
@@ -50,6 +64,15 @@ public class CampController extends BaseController {
     @GetMapping("/{slug}/similar")
     public ApiResponse<List<CampCardVO>> similar(@PathVariable String slug) {
         return ok(campService.similar(slug));
+    }
+
+    @PostMapping("/{slug}/view")
+    public ApiResponse<Boolean> recordView(
+            @PathVariable String slug,
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        campService.recordView(authorization, slug);
+        return ok(Boolean.TRUE);
     }
 
     @PostMapping("/compare")
